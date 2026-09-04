@@ -63,7 +63,7 @@ To push this repository as a Kaggle script kernel from local, create metadata fi
 
 ```bash
 python scripts/create_kaggle_metadata.py --username YOUR_KAGGLE_USERNAME --private --internet
-kaggle kernels push -p .
+kaggle kernels push -p . --accelerator NvidiaTeslaT4
 ```
 
 The Kaggle script entrypoint is:
@@ -83,6 +83,7 @@ python scripts/train_kaggle.py --config configs/smoke.yaml
 ```
 
 The Kaggle entrypoint defaults to `configs/kaggle_smoke.yaml`, which keeps the run short but enables online W&B tracking through Kaggle Secrets.
+If a CLI-pushed version cannot see `WANDB_API_KEY`, open the Kaggle notebook UI, enable the secret again in Add-ons > Secrets, and rerun the same version from Kaggle.
 
 Once the smoke run finishes, switch to the default configuration:
 
