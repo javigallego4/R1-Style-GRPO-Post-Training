@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for training and Kaggle smoke runs; evaluation-specific logging remains a later slice.
+Implemented and validated for Kaggle UI smoke/probe runs; evaluation-specific logging remains a later slice.
 
 ## Objective
 
@@ -15,6 +15,7 @@ Define how the project uses Weights & Biases to track GRPO runs, diagnose traini
 ## Current Behavior
 
 The repository contains optional W&B tracking controlled by YAML configuration, Kaggle Secret bootstrap support, local run manifests, and a lightweight W&B connectivity probe.
+The W&B probe has been validated from the Kaggle notebook UI with the `WANDB_API_KEY` secret enabled; the run logged `probe/ok` and `probe/enabled` under the `r1-grpo-kaggle` W&B project.
 
 ## Desired Behavior
 
@@ -55,7 +56,8 @@ The project should initialize W&B from configuration, log run metadata and train
 - Smoke test W&B initialization with environment-based authentication.
 - Confirm no credentials are printed or saved.
 - Confirm reward components appear as separate metrics.
-- Confirm the Kaggle UI can create a W&B probe run from the `WANDB_API_KEY` secret before launching training.
+- [x] Confirm the Kaggle UI can create a W&B probe run from the `WANDB_API_KEY` secret before launching training.
+- [x] Confirm CLI-pushed Kaggle executions do not reliably receive Kaggle Secrets and should not be treated as the W&B online validation path.
 
 ## Confirmed Decisions
 
@@ -79,3 +81,4 @@ The project should initialize W&B from configuration, log run metadata and train
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Added W&B configuration, Kaggle Secret bootstrap, run manifest tracking, and W&B probe workflow.
+- 2026-09-05: Validated the W&B probe from Kaggle UI and documented the CLI secret limitation.

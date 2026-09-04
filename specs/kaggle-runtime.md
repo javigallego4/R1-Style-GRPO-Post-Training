@@ -6,7 +6,7 @@
 
 ## Status
 
-Draft
+Implemented for Kaggle script execution and smoke validation; W&B online validation is supported through Kaggle UI secrets.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the repository should run on Kaggle's dual-T4 GPU environment from sc
 
 ## Current Behavior
 
-The repository does not yet contain Kaggle-specific execution instructions or scripts.
+The repository contains a Kaggle script entrypoint, kernel metadata generation, T4 accelerator metadata, runtime environment setup, smoke configuration, W&B Secret bootstrap, and documented CLI/UI execution notes.
 
 ## Desired Behavior
 
@@ -22,16 +22,16 @@ The project should provide a clear script-based workflow that can be launched in
 
 ## Acceptance Criteria
 
-- [ ] Kaggle execution is documented in the README.
-- [ ] Runtime setup does not require private local paths.
-- [ ] W&B authentication uses environment variables or Kaggle secrets.
-- [ ] Output directories are compatible with Kaggle persistence rules.
-- [ ] The training script can run with Kaggle T4x2 constraints.
-- [ ] The project documents expected memory/runtime constraints.
-- [ ] The project includes a minimal command sequence for Kaggle execution.
-- [ ] The repository can generate Kaggle kernel metadata without hardcoding a user account.
-- [ ] The Kaggle entrypoint is a Python script.
-- [ ] A smoke configuration exists for low-cost Kaggle validation before a full run.
+- [x] Kaggle execution is documented in the README.
+- [x] Runtime setup does not require private local paths.
+- [x] W&B authentication uses environment variables or Kaggle secrets.
+- [x] Output directories are compatible with Kaggle persistence rules.
+- [x] The training script can run with Kaggle T4x2 constraints.
+- [x] The project documents expected memory/runtime constraints.
+- [x] The project includes a minimal command sequence for Kaggle execution.
+- [x] The repository can generate Kaggle kernel metadata without hardcoding a user account.
+- [x] The Kaggle entrypoint is a Python script.
+- [x] A smoke configuration exists for low-cost Kaggle validation before a full run.
 
 ## Technical Notes
 
@@ -74,10 +74,10 @@ The project should provide a clear script-based workflow that can be launched in
 
 ## Open Questions
 
-- Should the repo include Kaggle metadata files for automated notebook/kernel creation?
 - Should outputs be exported as Kaggle Dataset/Model artifacts in v1?
-- Should dependency installation prefer `pip`, `uv`, or a plain requirements file for Kaggle?
+- Should dependency installation be pinned more tightly after the first full successful run?
 
 ## Change Log
 
 - 2026-09-03: Initial draft.
+- 2026-09-05: Marked Kaggle script runtime, T4 metadata, smoke config, and UI-based W&B validation as implemented.

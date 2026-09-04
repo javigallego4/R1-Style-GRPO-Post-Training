@@ -6,7 +6,7 @@
 
 ## Status
 
-Draft
+Implemented for smoke training; full default-run calibration remains pending.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define the script-first GRPO training pipeline for post-training a small instruc
 
 ## Current Behavior
 
-The repository does not yet contain model loading, adapter setup, or GRPO training code.
+The repository contains script-first GRPO training code with configurable Unsloth model loading, LoRA adapter setup, TRL GRPO trainer construction, smoke configuration, W&B integration, and local adapter saving.
 
 ## Desired Behavior
 
@@ -22,16 +22,16 @@ The project should expose a reproducible training script that loads the default 
 
 ## Acceptance Criteria
 
-- [ ] Training is launched from a script, not from notebook-only logic.
-- [ ] The default model is `unsloth/Llama-3.2-1B-Instruct-unsloth-bnb-4bit`.
-- [ ] Model name, LoRA settings, sequence length, batch size, learning rate, and GRPO parameters are configurable.
-- [ ] Training uses TRL GRPO.
-- [ ] Fine-tuning updates adapter weights rather than full model weights.
-- [ ] The training script supports a smoke-test mode.
-- [ ] A smoke configuration runs a tiny GRPO job before the default run.
-- [ ] Adapter artifacts are saved to a predictable output directory.
-- [ ] Training can resume or at least avoid losing final adapter artifacts when a run completes.
-- [ ] Adapter publication is controlled by configuration and disabled by default.
+- [x] Training is launched from a script, not from notebook-only logic.
+- [x] The default model is `unsloth/Llama-3.2-1B-Instruct-unsloth-bnb-4bit`.
+- [x] Model name, LoRA settings, sequence length, batch size, learning rate, and GRPO parameters are configurable.
+- [x] Training uses TRL GRPO.
+- [x] Fine-tuning updates adapter weights rather than full model weights.
+- [x] The training script supports a smoke-test mode.
+- [x] A smoke configuration runs a tiny GRPO job before the default run.
+- [x] Adapter artifacts are saved to a predictable output directory.
+- [x] Training can resume or at least avoid losing final adapter artifacts when a run completes.
+- [x] Adapter publication is controlled by configuration and disabled by default.
 
 ## Technical Notes
 
@@ -74,11 +74,11 @@ The project should expose a reproducible training script that loads the default 
 
 ## Open Questions
 
-- What should the default number of training steps be for the first Kaggle run?
-- What should the default number of generations per prompt be on T4x2?
-- Should the first version support checkpoint resume or only final adapter export?
+- What should the default number of training steps be for the first non-smoke Kaggle run after observing W&B training curves?
+- What should the default number of generations per prompt be on T4x2 after observing memory/runtime?
 - Which optional adapter publication destinations should be supported later?
 
 ## Change Log
 
 - 2026-09-03: Initial draft.
+- 2026-09-05: Marked script-first GRPO smoke training, LoRA adapter export, and W&B training integration as implemented.

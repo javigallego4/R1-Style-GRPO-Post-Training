@@ -6,7 +6,7 @@
 
 ## Status
 
-Draft
+Implemented for GSM8K train/eval preparation; malformed sample reporting remains pending.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the project loads, normalizes, splits, and exposes the reasoning task
 
 ## Current Behavior
 
-The repository does not yet contain data loading or task preparation code.
+The repository loads `openai/gsm8k` from configuration, builds training and evaluation splits, constructs prompts centrally, extracts numeric reference answers, and supports deterministic subset selection for smoke and evaluation modes.
 
 ## Desired Behavior
 
@@ -22,16 +22,16 @@ The project should load `openai/gsm8k`, use the training split for GRPO post-tra
 
 ## Acceptance Criteria
 
-- [ ] The dataset can be loaded from configuration.
-- [ ] The default dataset is `openai/gsm8k`.
-- [ ] Training data and evaluation data are kept separate.
-- [ ] Each sample exposes the original question, reference answer, and parsed final numeric answer.
-- [ ] A small subset mode exists for smoke tests.
-- [ ] Dataset preparation is deterministic when a seed is provided.
+- [x] The dataset can be loaded from configuration.
+- [x] The default dataset is `openai/gsm8k`.
+- [x] Training data and evaluation data are kept separate.
+- [x] Each sample exposes the original question, reference answer, and parsed final numeric answer.
+- [x] A small subset mode exists for smoke tests.
+- [x] Dataset preparation is deterministic when a seed is provided.
 - [ ] Malformed or unparsable samples are counted and reported.
-- [ ] Default configuration supports 1,000-2,000 training examples.
-- [ ] Default configuration supports 100-200 quick evaluation examples.
-- [ ] Final evaluation supports 500+ held-out examples when runtime allows.
+- [x] Default configuration supports 1,000-2,000 training examples.
+- [x] Default configuration supports 100-200 quick evaluation examples.
+- [x] Final evaluation supports 500+ held-out examples when runtime allows.
 
 ## Technical Notes
 
@@ -71,9 +71,9 @@ The project should load `openai/gsm8k`, use the training split for GRPO post-tra
 
 ## Open Questions
 
-- Should the default training subset be 1,000, 1,500, or 2,000 examples?
-- Should the first final report use exactly 500 held-out examples or more if runtime allows?
+- Should malformed/unparsable sample counts be written into evaluation/training manifests?
 
 ## Change Log
 
 - 2026-09-03: Initial draft.
+- 2026-09-05: Marked GSM8K loading, split handling, deterministic subset selection, and prompt/answer preparation as implemented.

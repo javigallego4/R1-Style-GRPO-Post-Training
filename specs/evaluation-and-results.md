@@ -6,7 +6,7 @@
 
 ## Status
 
-Draft
+Partially implemented; base-vs-adapter comparison, W&B evaluation logging, and final reporting remain pending.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the project evaluates the base model and trained adapter, saves resul
 
 ## Current Behavior
 
-The repository does not yet contain evaluation or result-generation code.
+The repository contains a basic evaluation script that loads the configured model, optionally applies a LoRA adapter, evaluates a reserved GSM8K split, computes exact numeric correctness, summarizes reward components, and writes JSON results.
 
 ## Desired Behavior
 
@@ -22,13 +22,13 @@ The project should run the same evaluation protocol on the base model and on the
 
 ## Acceptance Criteria
 
-- [ ] Evaluation can run on a reserved GSM8K split.
-- [ ] Base model and adapter evaluation use the same prompts and parsing rules.
-- [ ] Accuracy or exact-match correctness is reported.
+- [x] Evaluation can run on a reserved GSM8K split.
+- [x] Base model and adapter evaluation use the same prompts and parsing rules.
+- [x] Accuracy or exact-match correctness is reported.
 - [ ] Evaluation records parse failure rate.
-- [ ] Evaluation records format compliance where relevant.
-- [ ] Representative examples are saved for human inspection.
-- [ ] Metrics are saved in a machine-readable file.
+- [x] Evaluation records format compliance where relevant.
+- [x] Representative examples are saved for human inspection.
+- [x] Metrics are saved in a machine-readable file.
 - [ ] Evaluation results are logged to W&B when enabled.
 - [ ] Quick evaluation supports 100-200 held-out examples.
 - [ ] Final evaluation supports 500+ held-out examples when runtime allows.
@@ -55,6 +55,7 @@ The project should run the same evaluation protocol on the base model and on the
 - Unit test response parsing consistency.
 - Run evaluation on a small fixed subset.
 - Compare base model and adapter outputs in the same result schema.
+- Log evaluation metrics and selected examples to W&B when tracking is enabled.
 
 ## Confirmed Decisions
 
@@ -77,3 +78,4 @@ The project should run the same evaluation protocol on the base model and on the
 ## Change Log
 
 - 2026-09-03: Initial draft.
+- 2026-09-05: Marked basic JSON evaluation as partially implemented and identified base-vs-adapter/W&B reporting gaps.

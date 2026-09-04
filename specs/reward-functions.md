@@ -6,7 +6,7 @@
 
 ## Status
 
-Draft
+Implemented for v1 rule-based GRPO rewards.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define the reward functions used by GRPO and the validation needed to ensure the
 
 ## Current Behavior
 
-The repository does not yet contain reward functions.
+The repository contains deterministic reward functions for correctness, integer answer parsing, strict/soft XML-like format compliance, reasoning tag coverage, and component summaries for diagnostics.
 
 ## Desired Behavior
 
@@ -22,15 +22,15 @@ The project should provide modular, deterministic reward functions for mathemati
 
 ## Acceptance Criteria
 
-- [ ] Correctness reward compares the model's final parsed answer against the reference answer.
-- [ ] Integer answer reward detects whether the model produces a parseable integer answer.
-- [ ] Format rewards validate the requested output structure.
-- [ ] Reasoning-structure rewards validate that the model separates reasoning from the final answer.
-- [ ] Reward functions handle malformed, empty, and overlong completions safely.
-- [ ] Reward outputs are deterministic for identical inputs.
-- [ ] Each reward has unit tests covering positive and negative examples.
-- [ ] Reward components are available for W&B logging.
-- [ ] The default expected output format is validated consistently.
+- [x] Correctness reward compares the model's final parsed answer against the reference answer.
+- [x] Integer answer reward detects whether the model produces a parseable integer answer.
+- [x] Format rewards validate the requested output structure.
+- [x] Reasoning-structure rewards validate that the model separates reasoning from the final answer.
+- [x] Reward functions handle malformed, empty, and overlong completions safely.
+- [x] Reward outputs are deterministic for identical inputs.
+- [x] Each reward has unit tests covering positive and negative examples.
+- [x] Reward components are available for W&B logging.
+- [x] The default expected output format is validated consistently.
 
 ## Technical Notes
 
@@ -76,9 +76,10 @@ The project should provide modular, deterministic reward functions for mathemati
 
 ## Open Questions
 
-- Should correctness reward be binary, partially graded, or weighted with format rewards?
-- Should invalid format suppress correctness reward or be tracked independently?
+- Should correctness remain binary after the first non-smoke evaluation, or should numeric equivalence/partial credit be introduced?
+- Should invalid format suppress correctness reward in a later ablation, or remain tracked independently?
 
 ## Change Log
 
 - 2026-09-03: Initial draft.
+- 2026-09-05: Marked v1 reward functions, parsing helpers, component summaries, and tests as implemented.
