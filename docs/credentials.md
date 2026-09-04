@@ -13,6 +13,7 @@ wandb login
 For Kaggle runs, store the W&B API key as a Kaggle secret or inject it as an environment variable before training.
 The standard secret name is `WANDB_API_KEY`. Additional compatible secret names can be configured through `tracking.secret_names` if needed.
 After pushing a kernel from the Kaggle CLI, re-check the notebook's Add-ons > Secrets panel in the Kaggle web UI. CLI pushes can leave the new run without access to previously selected secrets, so the `WANDB_API_KEY` secret may need to be enabled again before rerunning the kernel.
+For a credentials-only check, run `WANDB_PROBE_ONLY=1 python kaggle_entry.py` in the Kaggle notebook UI. This creates a tiny W&B run and logs a single probe metric without starting GRPO training.
 
 Expected settings:
 

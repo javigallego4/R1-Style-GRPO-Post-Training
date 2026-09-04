@@ -111,6 +111,7 @@ def main() -> None:
         configure_wandb,
         configured_secret_names,
         kaggle_secret_diagnostics,
+        run_wandb_probe,
         wandb_status,
     )
     from r1_grpo_kaggle.train_grpo import train
@@ -122,6 +123,10 @@ def main() -> None:
     configure_wandb(config)
     print(f"Kaggle secret preflight: {kaggle_secret_diagnostics(configured_secret_names(config))}")
     print(f"W&B preflight: {wandb_status(config)}")
+    if os.environ.get("WANDB_PROBE_ONLY", "0") == "1":
+        print("Running W&B probe only because WANDB_PROBE_ONLY=1.")
+        print(f"W&B probe result: {run_wandb_probe(config)}")
+        return
     train(config_path)
 
 

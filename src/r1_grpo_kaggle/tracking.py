@@ -195,6 +195,28 @@ def initialize_wandb(config: dict[str, Any]) -> None:
         run.log_code(".")
 
 
+def run_wandb_probe(config: dict[str, Any]) -> dict[str, Any]:
+    require_wandb_api_key(config)
+    configure_wandb(config)
+
+    import wandb
+
+    run = wandb.init(**wandb_init_kwargs(config))
+    probe_payload = {
+        "probe/ok": 1,
+        "probe/enabled": int(is_wandb_enabled(config)),
+    }
+    wandb.log(probe_payload, step=0)
+    run_url = getattr(run, "url", None) if run is not None else None
+    if run is not None:
+        run.finish()
+    return {
+        "ok": True,
+        "run_url": run_url,
+        "status": wandb_status(config),
+    }
+
+
 def write_run_manifest(
     config: dict[str, Any],
     output_dir: str | Path,

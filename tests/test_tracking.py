@@ -1,4 +1,5 @@
 import os
+import builtins
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -9,6 +10,7 @@ from r1_grpo_kaggle.tracking import (
     ensure_wandb_api_key,
     kaggle_secret_diagnostics,
     require_wandb_api_key,
+    run_wandb_probe,
     sanitized_tracking_config,
     wandb_status,
     wandb_init_kwargs,
@@ -180,6 +182,60 @@ class TrackingTests(unittest.TestCase):
         self.assertIn('"error": "boom"', manifest)
         self.assertNotIn("secret-value", manifest)
         self.assertNotIn("secret_names", manifest)
+
+    @patch.dict(os.environ, {"WANDB_API_KEY": "secret-value"}, clear=True)
+    @patch("r1_grpo_kaggle.tracking.wandb_init_kwargs")
+    @patch("builtins.__import__")
+    def test_run_wandb_probe_logs_minimal_metric(self, mock_import, mock_kwargs):
+        class FakeRun:
+            url = "https://wandb.ai/example/run"
+
+            def __init__(self):
+                self.finished = False
+
+            def finish(self):
+                self.finished = True
+
+        class FakeWandb:
+            def __init__(self):
+                self.run = FakeRun()
+                self.logged = []
+
+            def init(self, **_kwargs):
+                return self.run
+
+            def log(self, payload, step=None):
+                self.logged.append((payload, step))
+
+        fake_wandb = FakeWandb()
+        real_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "wandb":
+                return fake_wandb
+            return real_import(name, *args, **kwargs)
+
+        mock_import.side_effect = fake_import
+        mock_kwargs.return_value = {"project": "custom-project", "name": "small-run"}
+        config = {
+            "project": {"name": "r1-grpo-kaggle"},
+            "model": {"name": "unsloth/test-model"},
+            "dataset": {"name": "openai/gsm8k"},
+            "tracking": {
+                "enabled": True,
+                "project_name": "custom-project",
+                "run_name": "small-run",
+                "mode": "online",
+                "secret_names": ["WANDB_API_KEY"],
+            },
+        }
+
+        result = run_wandb_probe(config)
+
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["run_url"], "https://wandb.ai/example/run")
+        self.assertEqual(fake_wandb.logged, [({"probe/ok": 1, "probe/enabled": 1}, 0)])
+        self.assertTrue(fake_wandb.run.finished)
 
 
 if __name__ == "__main__":
