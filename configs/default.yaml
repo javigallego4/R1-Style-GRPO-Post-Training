@@ -1,0 +1,93 @@
+project:
+  name: r1-grpo-kaggle
+  seed: 42
+
+model:
+  name: unsloth/Llama-3.2-1B-Instruct-unsloth-bnb-4bit
+  max_seq_length: 1024
+  load_in_4bit: true
+  use_unsloth: true
+
+dataset:
+  name: openai/gsm8k
+  subset: main
+  train_split: train
+  eval_split: test
+  train_size: 1500
+  quick_eval_size: 200
+  final_eval_size: 500
+
+prompt:
+  system: "You are a careful mathematical reasoning assistant. Solve the problem step by step and provide the final integer answer in the required XML format."
+  template: |
+    Solve this grade-school math problem.
+
+    Problem:
+    {question}
+
+    Respond exactly with:
+    <reasoning>
+    your reasoning
+    </reasoning>
+    <answer>
+    final integer answer
+    </answer>
+
+training:
+  output_dir: outputs/grpo-llama32-1b-gsm8k
+  max_steps: 1000
+  learning_rate: 0.000005
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 4
+  num_generations: 4
+  max_prompt_length: 512
+  max_completion_length: 256
+  temperature: 0.9
+  top_p: 0.95
+  logging_steps: 10
+  save_steps: 250
+  save_total_limit: 2
+  report_to:
+    - wandb
+
+lora:
+  r: 16
+  alpha: 16
+  dropout: 0.0
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+rewards:
+  correctness: 2.0
+  integer_answer: 0.2
+  strict_format: 0.5
+  soft_format: 0.2
+  reasoning_tags: 0.2
+
+tracking:
+  enabled: true
+  project_name: r1-grpo-kaggle
+  run_name: null
+  log_samples: true
+  log_adapter_artifacts: false
+  log_model_artifacts: false
+
+export:
+  save_adapter: true
+  adapter_dir: outputs/adapter
+  publish_adapter: false
+  destination: null
+
+evaluation:
+  output_dir: results
+  batch_size: 1
+  max_new_tokens: 256
+  temperature: 0.0
+  sample_count: 200
+

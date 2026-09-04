@@ -1,0 +1,31 @@
+[project]
+name = "r1-grpo-kaggle"
+version = "0.1.0"
+description = "Script-first GRPO post-training pipeline for small LLMs on Kaggle T4x2."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "accelerate>=0.34.0",
+  "bitsandbytes>=0.43.3",
+  "datasets>=2.21.0",
+  "peft>=0.12.0",
+  "pyyaml>=6.0.2",
+  "torch>=2.3.0",
+  "transformers>=4.44.0",
+  "trl>=0.11.4",
+  "wandb>=0.17.0",
+]
+
+[project.optional-dependencies]
+kaggle = [
+  "unsloth",
+]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.6.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
