@@ -7,7 +7,14 @@ from pathlib import Path
 from .config import load_config
 from .data import prepare_train_dataset
 from .rewards import reward_functions
-from .tracking import configure_wandb, initialize_wandb, is_wandb_enabled, wandb_run_name
+from .tracking import (
+    configure_wandb,
+    initialize_wandb,
+    is_wandb_enabled,
+    wandb_run_name,
+    wandb_status,
+    write_run_manifest,
+)
 
 
 def patch_unsloth_grpo_if_needed(config: dict):
@@ -121,37 +128,45 @@ def build_grpo_config(config: dict) -> GRPOConfig:
 def train(config_path: str) -> None:
     config = load_config(config_path)
     initialize_wandb(config)
-    fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
-    train_dataset = prepare_train_dataset(config)
-    model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(
-        config,
-        fast_language_model=fast_language_model,
-    )
-    config["training"]["bf16"] = bf16_supported
-    config["training"]["fp16"] = not bf16_supported
-    trainer_kwargs = {}
-    if not model_already_has_peft:
-        trainer_kwargs["peft_config"] = build_lora_config(config)
-    from trl import GRPOTrainer
+    output_dir = config["training"]["output_dir"]
+    print(f"W&B status: {wandb_status(config)}")
+    write_run_manifest(config, output_dir, "started")
+    try:
+        fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
+        train_dataset = prepare_train_dataset(config)
+        model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(
+            config,
+            fast_language_model=fast_language_model,
+        )
+        config["training"]["bf16"] = bf16_supported
+        config["training"]["fp16"] = not bf16_supported
+        trainer_kwargs = {}
+        if not model_already_has_peft:
+            trainer_kwargs["peft_config"] = build_lora_config(config)
+        from trl import GRPOTrainer
 
-    trainer = GRPOTrainer(
-        model=model,
-        args=build_grpo_config(config),
-        reward_funcs=reward_functions(),
-        train_dataset=train_dataset,
-        processing_class=tokenizer,
-        **trainer_kwargs,
-    )
-    trainer.train()
+        trainer = GRPOTrainer(
+            model=model,
+            args=build_grpo_config(config),
+            reward_funcs=reward_functions(),
+            train_dataset=train_dataset,
+            processing_class=tokenizer,
+            **trainer_kwargs,
+        )
+        trainer.train()
 
-    export_cfg = config["export"]
-    if export_cfg.get("save_adapter", True):
-        adapter_dir = Path(export_cfg["adapter_dir"])
-        adapter_dir.mkdir(parents=True, exist_ok=True)
-        trainer.model.save_pretrained(adapter_dir)
+        export_cfg = config["export"]
+        if export_cfg.get("save_adapter", True):
+            adapter_dir = Path(export_cfg["adapter_dir"])
+            adapter_dir.mkdir(parents=True, exist_ok=True)
+            trainer.model.save_pretrained(adapter_dir)
 
-    if export_cfg.get("publish_adapter", False):
-        raise RuntimeError("Adapter publication is intentionally disabled in v1.")
+        if export_cfg.get("publish_adapter", False):
+            raise RuntimeError("Adapter publication is intentionally disabled in v1.")
+        write_run_manifest(config, output_dir, "completed")
+    except Exception as exc:
+        write_run_manifest(config, output_dir, "failed", error=str(exc))
+        raise
 
 
 def main() -> None:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import os
+import json
 from copy import deepcopy
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 
@@ -46,6 +48,10 @@ def sanitized_tracking_config(config: dict[str, Any]) -> dict[str, Any]:
         safe_config.get("tracking", {}).pop(key, None)
     safe_config.get("tracking", {}).pop("secret_names", None)
     return safe_config
+
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def kaggle_secret_value(secret_names: tuple[str, ...] = WANDB_SECRET_NAMES) -> str | None:
@@ -95,6 +101,17 @@ def configure_wandb(config: dict[str, Any]) -> None:
     ensure_wandb_api_key(configured_secret_names(config))
 
 
+def wandb_status(config: dict[str, Any]) -> dict[str, Any]:
+    secret_names = configured_secret_names(config)
+    return {
+        "enabled": is_wandb_enabled(config),
+        "project": wandb_project_name(config),
+        "run_name": tracking_config(config).get("run_name"),
+        "mode": tracking_config(config).get("mode"),
+        "api_key_available": any(bool(os.environ.get(secret_name)) for secret_name in secret_names),
+    }
+
+
 def wandb_init_kwargs(config: dict[str, Any]) -> dict[str, Any]:
     tracking = tracking_config(config)
     kwargs: dict[str, Any] = {
@@ -127,3 +144,35 @@ def initialize_wandb(config: dict[str, Any]) -> None:
     run = wandb.init(**wandb_init_kwargs(config))
     if tracking_config(config).get("log_code") and run is not None:
         run.log_code(".")
+
+
+def write_run_manifest(
+    config: dict[str, Any],
+    output_dir: str | Path,
+    status: str,
+    error: str | None = None,
+) -> Path:
+    manifest_path = Path(output_dir) / "run_manifest.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    now = utc_now_iso()
+    existing: dict[str, Any] = {}
+    if manifest_path.exists():
+        try:
+            existing = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            existing = {}
+    payload = {
+        "status": status,
+        "started_at": existing.get("started_at", now),
+        "updated_at": now,
+        "wandb": wandb_status(config),
+        "config": sanitized_tracking_config(config),
+    }
+    if status == "completed":
+        payload["completed_at"] = now
+    if status == "failed":
+        payload["failed_at"] = now
+    if error:
+        payload["error"] = error
+    manifest_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return manifest_path

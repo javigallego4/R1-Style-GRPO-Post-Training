@@ -1,4 +1,5 @@
 import os
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -7,7 +8,9 @@ from r1_grpo_kaggle.tracking import (
     configured_secret_names,
     ensure_wandb_api_key,
     sanitized_tracking_config,
+    wandb_status,
     wandb_init_kwargs,
+    write_run_manifest,
 )
 
 
@@ -112,6 +115,46 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual(kwargs["notes"], "short run")
         self.assertEqual(kwargs["mode"], "offline")
         self.assertNotIn("secret_names", kwargs["config"]["tracking"])
+
+    def test_wandb_status_reports_key_presence_without_secret_value(self):
+        config = {
+            "project": {"name": "r1-grpo-kaggle"},
+            "model": {"name": "unsloth/test-model"},
+            "dataset": {"name": "openai/gsm8k"},
+            "tracking": {
+                "enabled": True,
+                "project_name": "custom-project",
+                "run_name": "small-run",
+                "mode": "online",
+                "secret_names": ["WANDB_API_KEY"],
+            },
+        }
+        with patch.dict(os.environ, {"WANDB_API_KEY": "secret-value"}, clear=True):
+            status = wandb_status(config)
+        self.assertTrue(status["api_key_available"])
+        self.assertNotIn("secret-value", str(status))
+
+    def test_write_run_manifest_saves_sanitized_local_status(self):
+        config = {
+            "project": {"name": "r1-grpo-kaggle"},
+            "model": {"name": "unsloth/test-model"},
+            "dataset": {"name": "openai/gsm8k"},
+            "tracking": {
+                "enabled": True,
+                "project_name": "custom-project",
+                "run_name": "small-run",
+                "mode": "offline",
+                "api_key": "secret-value",
+                "secret_names": ["WANDB_API_KEY"],
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest_path = write_run_manifest(config, tmpdir, "failed", error="boom")
+            manifest = manifest_path.read_text(encoding="utf-8")
+        self.assertIn('"status": "failed"', manifest)
+        self.assertIn('"error": "boom"', manifest)
+        self.assertNotIn("secret-value", manifest)
+        self.assertNotIn("secret_names", manifest)
 
 
 if __name__ == "__main__":

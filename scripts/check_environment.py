@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import platform
 import sys
 
@@ -22,6 +23,7 @@ def main() -> None:
     for package in PACKAGES:
         status = "OK" if importlib.util.find_spec(package) else "missing"
         print(f"{package}: {status}")
+    print(f"WANDB_API_KEY available: {bool(os.environ.get('WANDB_API_KEY'))}")
 
     try:
         import torch
@@ -36,4 +38,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

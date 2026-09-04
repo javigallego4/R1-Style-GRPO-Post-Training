@@ -101,6 +101,8 @@ All important choices live in `configs/default.yaml`, including model, dataset s
 
 W&B is controlled from the `tracking` section. Keep `tracking.enabled: false` for local smoke tests without login, use `tracking.mode: offline` when you want local W&B files only, and use `tracking.mode: online` on Kaggle when the `WANDB_API_KEY` secret is available.
 
+Each training run also writes a sanitized `run_manifest.json` inside the configured training output directory, so partial Kaggle runs leave local status and config metadata even if external tracking is unavailable.
+
 ## Credentials
 
 Credential setup is documented in `docs/credentials.md`. Real tokens and private keys must stay outside the repository.
