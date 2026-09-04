@@ -71,7 +71,7 @@ The Kaggle script entrypoint is:
 python kaggle_entry.py
 ```
 
-It installs `requirements.txt` by default and then launches the configured GRPO training run. Set `INSTALL_DEPS=0` if dependencies are already available.
+By default it uses a strict Unsloth setup for Kaggle: it refreshes the CUDA PyTorch/vLLM stack, installs Unsloth, and then launches the configured GRPO training run. Set `INSTALL_DEPS=0` if dependencies are already available, or `KAGGLE_STRICT_UNSLOTH_SETUP=0` to install from `requirements.txt` instead.
 
 Before a long run, check the Kaggle environment:
 

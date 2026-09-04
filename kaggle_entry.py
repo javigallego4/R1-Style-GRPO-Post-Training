@@ -29,6 +29,32 @@ def install_dependencies(project_dir: Path) -> None:
     if os.environ.get("INSTALL_DEPS", "1") != "1":
         print("Skipping dependency installation because INSTALL_DEPS is not 1.")
         return
+
+    if os.environ.get("KAGGLE_STRICT_UNSLOTH_SETUP", "1") == "1":
+        run([sys.executable, "-m", "pip", "install", "-q", "pip3-autoremove"])
+        subprocess.run(
+            ["pip-autoremove", "torch", "torchvision", "torchaudio", "vllm", "-y"],
+            check=False,
+        )
+        run(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "-q",
+                "torch",
+                "torchvision",
+                "torchaudio",
+                "xformers",
+                "--index-url",
+                "https://download.pytorch.org/whl/cu121",
+            ]
+        )
+        run([sys.executable, "-m", "pip", "install", "-q", "unsloth", "vllm", "pynvml==12.0.0"])
+        run([sys.executable, "-m", "pip", "install", "-q", "datasets", "pyyaml", "wandb"])
+        return
+
     run([sys.executable, "-m", "pip", "install", "-q", "-r", str(project_dir / "requirements.txt")])
 
 

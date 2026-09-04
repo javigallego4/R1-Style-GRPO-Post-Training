@@ -10,6 +10,16 @@ from .rewards import reward_functions
 from .tracking import is_wandb_enabled, wandb_project_name, wandb_run_name
 
 
+def patch_unsloth_grpo_if_needed(config: dict):
+    if not config["model"].get("use_unsloth", True):
+        return None, False
+
+    from unsloth import FastLanguageModel, PatchFastRL
+
+    PatchFastRL("GRPO", FastLanguageModel)
+    return FastLanguageModel, True
+
+
 def build_lora_config(config: dict):
     from peft import LoraConfig
 
@@ -23,15 +33,22 @@ def build_lora_config(config: dict):
     )
 
 
-def load_policy_model(config: dict):
+def load_policy_model(config: dict, fast_language_model=None):
     model_cfg = config["model"]
     if model_cfg.get("use_unsloth", True):
-        from unsloth import FastLanguageModel, is_bfloat16_supported
+        from unsloth import is_bfloat16_supported
+
+        FastLanguageModel = fast_language_model
+        if FastLanguageModel is None:
+            FastLanguageModel, _ = patch_unsloth_grpo_if_needed(config)
 
         model, tokenizer = FastLanguageModel.from_pretrained(
             model_name=model_cfg["name"],
             max_seq_length=model_cfg["max_seq_length"],
             load_in_4bit=model_cfg.get("load_in_4bit", True),
+            fast_inference=model_cfg.get("fast_inference", True),
+            gpu_memory_utilization=model_cfg.get("gpu_memory_utilization", 0.6),
+            max_lora_rank=config["lora"]["r"],
         )
         model = FastLanguageModel.get_peft_model(
             model,
@@ -79,10 +96,17 @@ def build_grpo_config(config: dict) -> GRPOConfig:
         max_completion_length=training["max_completion_length"],
         temperature=training["temperature"],
         top_p=training["top_p"],
+        use_vllm=training.get("use_vllm", False),
         logging_steps=training["logging_steps"],
         save_steps=training["save_steps"],
         save_total_limit=training["save_total_limit"],
         optim=training.get("optim", "paged_adamw_8bit"),
+        adam_beta1=training.get("adam_beta1", 0.9),
+        adam_beta2=training.get("adam_beta2", 0.999),
+        weight_decay=training.get("weight_decay", 0.0),
+        warmup_ratio=training.get("warmup_ratio", 0.0),
+        lr_scheduler_type=training.get("lr_scheduler_type", "linear"),
+        max_grad_norm=training.get("max_grad_norm", 1.0),
         bf16=bool(training.get("bf16", False)),
         fp16=bool(training.get("fp16", True)),
         seed=int(config.get("project", {}).get("seed", 42)),
@@ -95,12 +119,13 @@ def build_grpo_config(config: dict) -> GRPOConfig:
 
 
 def train(config_path: str) -> None:
-    if load_config(config_path)["model"].get("use_unsloth", True):
-        import unsloth  # noqa: F401
-
     config = load_config(config_path)
+    fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
     train_dataset = prepare_train_dataset(config)
-    model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(config)
+    model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(
+        config,
+        fast_language_model=fast_language_model,
+    )
     config["training"]["bf16"] = bf16_supported
     config["training"]["fp16"] = not bf16_supported
     trainer_kwargs = {}
