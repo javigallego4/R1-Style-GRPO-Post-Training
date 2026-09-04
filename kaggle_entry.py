@@ -6,7 +6,13 @@ import sys
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
+def entrypoint_root() -> Path:
+    if "__file__" in globals():
+        return Path(__file__).resolve().parent
+    return Path.cwd()
+
+
+ROOT = entrypoint_root()
 REPO_URL = "https://github.com/javigallego4/R1-Style-GRPO-Post-Training.git"
 KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
 
