@@ -51,7 +51,7 @@ def install_dependencies(project_dir: Path) -> None:
                 "https://download.pytorch.org/whl/cu121",
             ]
         )
-        run([sys.executable, "-m", "pip", "install", "-q", "unsloth", "vllm", "pynvml==12.0.0"])
+        run([sys.executable, "-m", "pip", "install", "-q", "unsloth", "vllm", "pynvml==12.0.0", "ninja"])
         run([sys.executable, "-m", "pip", "install", "-q", "datasets", "pyyaml", "wandb"])
         return
 
@@ -59,6 +59,8 @@ def install_dependencies(project_dir: Path) -> None:
 
 
 def main() -> None:
+    os.environ.setdefault("UNSLOTH_VLLM_NO_FLASHINFER", "1")
+
     project_dir = resolve_project_dir()
     os.chdir(project_dir)
     install_dependencies(project_dir)
