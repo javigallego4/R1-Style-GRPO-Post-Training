@@ -7,20 +7,36 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent
+REPO_URL = "https://github.com/javigallego4/R1-Style-GRPO-Post-Training.git"
+KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
 
 
-def install_dependencies() -> None:
+def run(command: list[str], cwd: Path | None = None) -> None:
+    print("+ " + " ".join(command))
+    subprocess.check_call(command, cwd=cwd)
+
+
+def resolve_project_dir() -> Path:
+    if (ROOT / "requirements.txt").exists() and (ROOT / "src").exists():
+        return ROOT
+
+    if not KAGGLE_REPO_DIR.exists():
+        run(["git", "clone", "--depth", "1", REPO_URL, str(KAGGLE_REPO_DIR)])
+    return KAGGLE_REPO_DIR
+
+
+def install_dependencies(project_dir: Path) -> None:
     if os.environ.get("INSTALL_DEPS", "1") != "1":
         print("Skipping dependency installation because INSTALL_DEPS is not 1.")
         return
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "-q", "-r", str(ROOT / "requirements.txt")]
-    )
+    run([sys.executable, "-m", "pip", "install", "-q", "-r", str(project_dir / "requirements.txt")])
 
 
 def main() -> None:
-    install_dependencies()
-    sys.path.insert(0, str(ROOT / "src"))
+    project_dir = resolve_project_dir()
+    os.chdir(project_dir)
+    install_dependencies(project_dir)
+    sys.path.insert(0, str(project_dir / "src"))
 
     from r1_grpo_kaggle.train_grpo import train
 
