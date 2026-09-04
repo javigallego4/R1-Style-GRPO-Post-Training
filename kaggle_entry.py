@@ -13,8 +13,9 @@ KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
 
 def configure_runtime_environment() -> None:
     os.environ.setdefault("UNSLOTH_VLLM_NO_FLASHINFER", "1")
+    os.environ.setdefault("VLLM_USE_V1", "0")
     os.environ.setdefault("VLLM_USE_FLASHINFER_SAMPLER", "0")
-    os.environ.setdefault("VLLM_ATTENTION_BACKEND", "TRITON_ATTN")
+    os.environ.setdefault("VLLM_ATTENTION_BACKEND", "XFORMERS")
 
 
 def run(command: list[str], cwd: Path | None = None) -> None:
