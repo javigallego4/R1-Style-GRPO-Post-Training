@@ -24,10 +24,9 @@ def main() -> None:
 
     from r1_grpo_kaggle.train_grpo import train
 
-    config_path = os.environ.get("CONFIG_PATH", "configs/default.yaml")
+    config_path = os.environ.get("CONFIG_PATH", "configs/smoke.yaml")
     train(config_path)
 
 
 if __name__ == "__main__":
     main()
-
