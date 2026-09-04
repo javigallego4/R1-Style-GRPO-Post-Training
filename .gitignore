@@ -6,6 +6,7 @@ __pycache__/
 venv/
 
 .env
+kernel-metadata.json
 wandb/
 
 outputs/
@@ -16,4 +17,3 @@ results/*.parquet
 results/*.png
 results/*.html
 !results/.gitkeep
-
