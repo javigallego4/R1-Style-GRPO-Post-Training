@@ -85,6 +85,20 @@ def ensure_wandb_api_key(secret_names: tuple[str, ...] = WANDB_SECRET_NAMES) -> 
     return False
 
 
+def require_wandb_api_key(config: dict[str, Any]) -> None:
+    if not is_wandb_enabled(config):
+        return
+    mode = tracking_config(config).get("mode")
+    if mode in {"offline", "disabled"}:
+        return
+    if ensure_wandb_api_key(configured_secret_names(config)):
+        return
+    raise RuntimeError(
+        "W&B tracking is enabled in online mode, but no API key is available. "
+        "Configure a Kaggle Secret named WANDB_API_KEY or set tracking.mode: offline."
+    )
+
+
 def configure_wandb(config: dict[str, Any]) -> None:
     if not is_wandb_enabled(config):
         return

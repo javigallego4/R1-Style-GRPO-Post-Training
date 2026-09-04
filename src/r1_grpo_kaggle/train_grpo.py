@@ -11,6 +11,7 @@ from .tracking import (
     configure_wandb,
     initialize_wandb,
     is_wandb_enabled,
+    require_wandb_api_key,
     wandb_run_name,
     wandb_status,
     write_run_manifest,
@@ -152,11 +153,13 @@ def build_grpo_config(config: dict) -> GRPOConfig:
 
 def train(config_path: str) -> None:
     config = load_config(config_path)
-    initialize_wandb(config)
     output_dir = config["training"]["output_dir"]
+    configure_wandb(config)
     print(f"W&B status: {wandb_status(config)}")
     write_run_manifest(config, output_dir, "started")
     try:
+        require_wandb_api_key(config)
+        initialize_wandb(config)
         validate_cuda_capability(config)
         fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
         train_dataset = prepare_train_dataset(config)

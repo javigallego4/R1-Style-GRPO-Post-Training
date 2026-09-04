@@ -7,6 +7,7 @@ from r1_grpo_kaggle.tracking import (
     configure_wandb,
     configured_secret_names,
     ensure_wandb_api_key,
+    require_wandb_api_key,
     sanitized_tracking_config,
     wandb_status,
     wandb_init_kwargs,
@@ -133,6 +134,23 @@ class TrackingTests(unittest.TestCase):
             status = wandb_status(config)
         self.assertTrue(status["api_key_available"])
         self.assertNotIn("secret-value", str(status))
+
+    def test_require_wandb_api_key_fails_clearly_for_online_without_key(self):
+        config = {
+            "project": {"name": "r1-grpo-kaggle"},
+            "model": {"name": "unsloth/test-model"},
+            "dataset": {"name": "openai/gsm8k"},
+            "tracking": {
+                "enabled": True,
+                "project_name": "custom-project",
+                "run_name": "small-run",
+                "mode": "online",
+                "secret_names": ["WANDB_API_KEY"],
+            },
+        }
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "WANDB_API_KEY"):
+                require_wandb_api_key(config)
 
     def test_write_run_manifest_saves_sanitized_local_status(self):
         config = {
