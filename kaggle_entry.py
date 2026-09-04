@@ -18,6 +18,31 @@ def configure_runtime_environment() -> None:
     os.environ.setdefault("VLLM_ATTENTION_BACKEND", "XFORMERS")
 
 
+def bootstrap_wandb_from_kaggle_secret() -> None:
+    if os.environ.get("WANDB_API_KEY"):
+        print("Direct Kaggle secret bootstrap: WANDB_API_KEY already available from environment.")
+        return
+
+    try:
+        from kaggle_secrets import UserSecretsClient
+    except ImportError:
+        print("Direct Kaggle secret bootstrap: kaggle_secrets is not available.")
+        return
+
+    user_secrets = UserSecretsClient()
+    try:
+        secret_value_0 = user_secrets.get_secret("WANDB_API_KEY")
+    except Exception as exc:
+        print(f"Direct Kaggle secret bootstrap: WANDB_API_KEY unavailable ({exc.__class__.__name__}).")
+        return
+
+    if secret_value_0:
+        os.environ["WANDB_API_KEY"] = secret_value_0
+        print("Direct Kaggle secret bootstrap: WANDB_API_KEY loaded.")
+    else:
+        print("Direct Kaggle secret bootstrap: WANDB_API_KEY returned an empty value.")
+
+
 def run(command: list[str], cwd: Path | None = None) -> None:
     print("+ " + " ".join(command))
     subprocess.check_call(command, cwd=cwd)
@@ -68,6 +93,7 @@ def install_dependencies(project_dir: Path) -> None:
 
 def main() -> None:
     configure_runtime_environment()
+    bootstrap_wandb_from_kaggle_secret()
 
     project_dir = resolve_project_dir()
     os.chdir(project_dir)
