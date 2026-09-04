@@ -24,6 +24,15 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(config["tracking"]["mode"], "disabled")
         self.assertFalse(config["export"]["publish_adapter"])
 
+    def test_kaggle_smoke_config_enables_tracking(self):
+        config = load_config("/Users/javigallego/Desktop/r1-grpo-kaggle/configs/kaggle_smoke.yaml")
+        self.assertEqual(config["training"]["max_steps"], 10)
+        self.assertTrue(config["tracking"]["enabled"])
+        self.assertEqual(config["tracking"]["mode"], "online")
+        self.assertEqual(config["tracking"]["run_name"], "kaggle-smoke")
+        self.assertFalse(config["tracking"]["log_adapter_artifacts"])
+        self.assertFalse(config["export"]["publish_adapter"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -82,6 +82,8 @@ python scripts/inspect_data.py --config configs/smoke.yaml
 python scripts/train_kaggle.py --config configs/smoke.yaml
 ```
 
+The Kaggle entrypoint defaults to `configs/kaggle_smoke.yaml`, which keeps the run short but enables online W&B tracking through Kaggle Secrets.
+
 Once the smoke run finishes, switch to the default configuration:
 
 ```bash

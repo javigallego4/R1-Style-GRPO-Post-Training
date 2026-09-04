@@ -76,7 +76,7 @@ def main() -> None:
 
     from r1_grpo_kaggle.train_grpo import train
 
-    config_path = os.environ.get("CONFIG_PATH", "configs/smoke.yaml")
+    config_path = os.environ.get("CONFIG_PATH", "configs/kaggle_smoke.yaml")
     print(f"Project directory: {project_dir}")
     print(f"Config path: {config_path}")
     train(config_path)
