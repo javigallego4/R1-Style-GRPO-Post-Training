@@ -16,6 +16,11 @@ def main() -> None:
         action="store_true",
         help="Enable internet in Kaggle. Required to download models/datasets unless mirrored as Kaggle inputs.",
     )
+    parser.add_argument(
+        "--accelerator",
+        default="NvidiaTeslaT4",
+        help="Kaggle accelerator machine shape. Use NvidiaTeslaT4 for the default GPU target.",
+    )
     args = parser.parse_args()
 
     metadata = {
@@ -27,6 +32,7 @@ def main() -> None:
         "is_private": "true" if args.private else "false",
         "enable_gpu": "true",
         "enable_internet": "true" if args.internet else "false",
+        "machine_shape": args.accelerator,
         "dataset_sources": [],
         "competition_sources": [],
         "kernel_sources": [],
@@ -39,4 +45,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -76,6 +76,31 @@ def load_policy_model(config: dict, fast_language_model=None):
     return model, tokenizer, False, False
 
 
+def validate_cuda_capability(config: dict) -> None:
+    if not config["model"].get("use_unsloth", True):
+        return
+    try:
+        import torch
+    except ImportError:
+        return
+    if not torch.cuda.is_available():
+        return
+    unsupported_devices = []
+    for device_idx in range(torch.cuda.device_count()):
+        major, minor = torch.cuda.get_device_capability(device_idx)
+        if major < 7:
+            unsupported_devices.append(
+                f"{torch.cuda.get_device_name(device_idx)} sm_{major}{minor}"
+            )
+    if unsupported_devices:
+        devices = ", ".join(unsupported_devices)
+        raise RuntimeError(
+            "This Unsloth/PyTorch setup requires a T4-class GPU or newer. "
+            f"Unsupported CUDA device(s): {devices}. "
+            "Use Kaggle accelerator NvidiaTeslaT4 for this project."
+        )
+
+
 def build_grpo_config(config: dict) -> GRPOConfig:
     from trl import GRPOConfig
 
@@ -132,6 +157,7 @@ def train(config_path: str) -> None:
     print(f"W&B status: {wandb_status(config)}")
     write_run_manifest(config, output_dir, "started")
     try:
+        validate_cuda_capability(config)
         fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
         train_dataset = prepare_train_dataset(config)
         model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(

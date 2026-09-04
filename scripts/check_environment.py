@@ -31,7 +31,9 @@ def main() -> None:
         print(f"CUDA available: {torch.cuda.is_available()}")
         print(f"CUDA device count: {torch.cuda.device_count()}")
         for idx in range(torch.cuda.device_count()):
-            print(f"GPU {idx}: {torch.cuda.get_device_name(idx)}")
+            major, minor = torch.cuda.get_device_capability(idx)
+            supported = major >= 7
+            print(f"GPU {idx}: {torch.cuda.get_device_name(idx)} sm_{major}{minor} supported: {supported}")
     except Exception as exc:
         print(f"torch/CUDA check failed: {exc}")
 

@@ -28,7 +28,8 @@ def resolve_project_dir() -> Path:
         return ROOT
 
     if not KAGGLE_REPO_DIR.exists():
-        run(["git", "clone", "--depth", "1", REPO_URL, str(KAGGLE_REPO_DIR)])
+        repo_ref = os.environ.get("KAGGLE_REPO_REF", "main")
+        run(["git", "clone", "--depth", "1", "--branch", repo_ref, REPO_URL, str(KAGGLE_REPO_DIR)])
     return KAGGLE_REPO_DIR
 
 
