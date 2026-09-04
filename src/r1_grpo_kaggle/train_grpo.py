@@ -7,7 +7,7 @@ from pathlib import Path
 from .config import load_config
 from .data import prepare_train_dataset
 from .rewards import reward_functions
-from .tracking import is_wandb_enabled, wandb_project_name, wandb_run_name
+from .tracking import configure_wandb, initialize_wandb, is_wandb_enabled, wandb_run_name
 
 
 def patch_unsloth_grpo_if_needed(config: dict):
@@ -75,7 +75,7 @@ def build_grpo_config(config: dict) -> GRPOConfig:
     training = config["training"]
     report_to = ["wandb"] if is_wandb_enabled(config) else []
     if is_wandb_enabled(config):
-        os.environ.setdefault("WANDB_PROJECT", wandb_project_name(config))
+        configure_wandb(config)
     reward_cfg = config.get("rewards", {})
     reward_weights = [
         reward_cfg.get("correctness", 1.0),
@@ -120,6 +120,7 @@ def build_grpo_config(config: dict) -> GRPOConfig:
 
 def train(config_path: str) -> None:
     config = load_config(config_path)
+    initialize_wandb(config)
     fast_language_model, _ = patch_unsloth_grpo_if_needed(config)
     train_dataset = prepare_train_dataset(config)
     model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(
