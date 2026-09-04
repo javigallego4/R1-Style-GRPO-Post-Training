@@ -7,6 +7,7 @@ from r1_grpo_kaggle.tracking import (
     configure_wandb,
     configured_secret_names,
     ensure_wandb_api_key,
+    kaggle_secret_diagnostics,
     require_wandb_api_key,
     sanitized_tracking_config,
     wandb_status,
@@ -71,6 +72,12 @@ class TrackingTests(unittest.TestCase):
         with patch.dict(os.environ, {"wandb_api_key": "secret-value"}, clear=True):
             self.assertTrue(ensure_wandb_api_key())
             self.assertEqual(os.environ["WANDB_API_KEY"], "secret-value")
+
+    @patch("builtins.__import__", side_effect=ImportError)
+    def test_kaggle_secret_diagnostics_handles_missing_package(self, _mock_import):
+        diagnostics = kaggle_secret_diagnostics(("WANDB_API_KEY",))
+        self.assertFalse(diagnostics["kaggle_secrets_available"])
+        self.assertEqual(diagnostics["checks"], [])
 
     def test_sanitized_tracking_config_removes_secret_like_tracking_keys(self):
         config = {

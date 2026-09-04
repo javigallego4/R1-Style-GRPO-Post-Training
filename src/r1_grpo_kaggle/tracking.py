@@ -71,6 +71,41 @@ def kaggle_secret_value(secret_names: tuple[str, ...] = WANDB_SECRET_NAMES) -> s
     return None
 
 
+def kaggle_secret_diagnostics(secret_names: tuple[str, ...] = WANDB_SECRET_NAMES) -> dict[str, Any]:
+    try:
+        from kaggle_secrets import UserSecretsClient
+    except ImportError:
+        return {
+            "kaggle_secrets_available": False,
+            "checks": [],
+        }
+
+    user_secrets = UserSecretsClient()
+    checks = []
+    for secret_name in secret_names:
+        try:
+            value = user_secrets.get_secret(secret_name)
+        except Exception as exc:
+            checks.append(
+                {
+                    "name": secret_name,
+                    "available": False,
+                    "error_type": exc.__class__.__name__,
+                }
+            )
+            continue
+        checks.append(
+            {
+                "name": secret_name,
+                "available": bool(value),
+            }
+        )
+    return {
+        "kaggle_secrets_available": True,
+        "checks": checks,
+    }
+
+
 def ensure_wandb_api_key(secret_names: tuple[str, ...] = WANDB_SECRET_NAMES) -> bool:
     for secret_name in secret_names:
         value = os.environ.get(secret_name)

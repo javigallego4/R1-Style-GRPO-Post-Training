@@ -74,11 +74,22 @@ def main() -> None:
     install_dependencies(project_dir)
     sys.path.insert(0, str(project_dir / "src"))
 
+    from r1_grpo_kaggle.config import load_config
+    from r1_grpo_kaggle.tracking import (
+        configure_wandb,
+        configured_secret_names,
+        kaggle_secret_diagnostics,
+        wandb_status,
+    )
     from r1_grpo_kaggle.train_grpo import train
 
     config_path = os.environ.get("CONFIG_PATH", "configs/kaggle_smoke.yaml")
     print(f"Project directory: {project_dir}")
     print(f"Config path: {config_path}")
+    config = load_config(config_path)
+    configure_wandb(config)
+    print(f"Kaggle secret preflight: {kaggle_secret_diagnostics(configured_secret_names(config))}")
+    print(f"W&B preflight: {wandb_status(config)}")
     train(config_path)
 
 
