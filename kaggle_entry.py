@@ -11,6 +11,13 @@ REPO_URL = "https://github.com/javigallego4/R1-Style-GRPO-Post-Training.git"
 KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
 
 
+def configure_runtime_environment() -> None:
+    os.environ.setdefault("UNSLOTH_VLLM_NO_FLASHINFER", "1")
+    os.environ.setdefault("UNSLOTH_VLLM_STANDBY", "1")
+    os.environ.setdefault("VLLM_USE_FLASHINFER_SAMPLER", "0")
+    os.environ.setdefault("VLLM_ATTENTION_BACKEND", "TRITON_ATTN")
+
+
 def run(command: list[str], cwd: Path | None = None) -> None:
     print("+ " + " ".join(command))
     subprocess.check_call(command, cwd=cwd)
@@ -59,7 +66,7 @@ def install_dependencies(project_dir: Path) -> None:
 
 
 def main() -> None:
-    os.environ.setdefault("UNSLOTH_VLLM_NO_FLASHINFER", "1")
+    configure_runtime_environment()
 
     project_dir = resolve_project_dir()
     os.chdir(project_dir)
