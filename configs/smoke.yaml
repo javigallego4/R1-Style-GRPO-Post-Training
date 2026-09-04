@@ -58,7 +58,6 @@ training:
   lr_scheduler_type: cosine
   max_grad_norm: 0.1
   optim: paged_adamw_8bit
-  report_to: []
 
 lora:
   r: 8
@@ -83,8 +82,21 @@ rewards:
 tracking:
   enabled: false
   project_name: r1-grpo-kaggle
+  entity: null
   run_name: smoke
+  group: smoke
+  job_type: smoke-test
+  tags:
+    - smoke
+    - grpo
+  notes: null
+  mode: disabled
+  secret_names:
+    - WANDB_API_KEY
+    - wandb_api_key
+    - wandb_api
   log_samples: false
+  log_code: false
   log_adapter_artifacts: false
   log_model_artifacts: false
 

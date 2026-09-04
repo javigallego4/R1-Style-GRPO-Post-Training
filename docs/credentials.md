@@ -11,17 +11,25 @@ wandb login
 ```
 
 For Kaggle runs, store the W&B API key as a Kaggle secret or inject it as an environment variable before training.
+The standard secret name is `WANDB_API_KEY`. Additional compatible secret names can be configured through `tracking.secret_names` if needed.
 
 Expected settings:
 
-```text
-WANDB_PROJECT=r1-grpo-kaggle
+```yaml
+tracking:
+  enabled: true
+  project_name: r1-grpo-kaggle
+  mode: online
+  secret_names:
+    - WANDB_API_KEY
 ```
 
 The default config keeps adapter artifact uploads disabled:
 
 ```yaml
 tracking:
+  enabled: true
+  log_code: false
   log_adapter_artifacts: false
   log_model_artifacts: false
 
@@ -61,4 +69,3 @@ gh auth login -h github.com
 ```
 
 After authentication, create the remote repository and push when ready.
-

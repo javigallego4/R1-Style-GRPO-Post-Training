@@ -11,12 +11,17 @@ class ConfigTests(unittest.TestCase):
             "unsloth/Llama-3.2-1B-Instruct-unsloth-bnb-4bit",
         )
         self.assertFalse(config["export"]["publish_adapter"])
+        self.assertTrue(config["tracking"]["enabled"])
+        self.assertEqual(config["tracking"]["mode"], "online")
+        self.assertIn("WANDB_API_KEY", config["tracking"]["secret_names"])
+        self.assertFalse(config["tracking"]["log_adapter_artifacts"])
 
     def test_smoke_config_loads(self):
         config = load_config("/Users/javigallego/Desktop/r1-grpo-kaggle/configs/smoke.yaml")
         self.assertEqual(config["training"]["max_steps"], 10)
         self.assertEqual(config["training"]["generation_batch_size"], 2)
         self.assertFalse(config["tracking"]["enabled"])
+        self.assertEqual(config["tracking"]["mode"], "disabled")
         self.assertFalse(config["export"]["publish_adapter"])
 
 

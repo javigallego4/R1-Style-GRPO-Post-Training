@@ -99,6 +99,8 @@ python scripts/evaluate.py --config configs/default.yaml --adapter-path outputs/
 
 All important choices live in `configs/default.yaml`, including model, dataset size, GRPO settings, reward weights, W&B settings, and adapter export behavior.
 
+W&B is controlled from the `tracking` section. Keep `tracking.enabled: false` for local smoke tests without login, use `tracking.mode: offline` when you want local W&B files only, and use `tracking.mode: online` on Kaggle when the `WANDB_API_KEY` secret is available.
+
 ## Credentials
 
 Credential setup is documented in `docs/credentials.md`. Real tokens and private keys must stay outside the repository.
