@@ -29,6 +29,7 @@ Planned scope:
 - Training: GRPO-only
 - Tracking: Weights & Biases
 - Adapter policy: save locally, do not publish by default
+- Runtime: Unsloth training path enabled; vLLM fast inference disabled by default for Kaggle compatibility
 
 ## Output Format
 

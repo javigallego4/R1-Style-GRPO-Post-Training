@@ -7,7 +7,7 @@ model:
   max_seq_length: 512
   load_in_4bit: true
   use_unsloth: true
-  fast_inference: true
+  fast_inference: false
   gpu_memory_utilization: 0.5
 
 dataset:
@@ -50,7 +50,7 @@ training:
   logging_steps: 1
   save_steps: 10
   save_total_limit: 1
-  use_vllm: true
+  use_vllm: false
   adam_beta1: 0.9
   adam_beta2: 0.99
   weight_decay: 0.1
