@@ -4,16 +4,15 @@ import argparse
 import os
 from pathlib import Path
 
-from peft import LoraConfig
-from trl import GRPOConfig, GRPOTrainer
-
 from .config import load_config
 from .data import prepare_train_dataset
 from .rewards import reward_functions
 from .tracking import is_wandb_enabled, wandb_project_name, wandb_run_name
 
 
-def build_lora_config(config: dict) -> LoraConfig:
+def build_lora_config(config: dict):
+    from peft import LoraConfig
+
     lora_cfg = config["lora"]
     return LoraConfig(
         r=lora_cfg["r"],
@@ -54,6 +53,8 @@ def load_policy_model(config: dict):
 
 
 def build_grpo_config(config: dict) -> GRPOConfig:
+    from trl import GRPOConfig
+
     training = config["training"]
     report_to = ["wandb"] if is_wandb_enabled(config) else []
     if is_wandb_enabled(config):
@@ -71,6 +72,7 @@ def build_grpo_config(config: dict) -> GRPOConfig:
         max_steps=training["max_steps"],
         learning_rate=training["learning_rate"],
         per_device_train_batch_size=training["per_device_train_batch_size"],
+        generation_batch_size=training.get("generation_batch_size"),
         gradient_accumulation_steps=training["gradient_accumulation_steps"],
         num_generations=training["num_generations"],
         max_prompt_length=training["max_prompt_length"],
@@ -93,6 +95,9 @@ def build_grpo_config(config: dict) -> GRPOConfig:
 
 
 def train(config_path: str) -> None:
+    if load_config(config_path)["model"].get("use_unsloth", True):
+        import unsloth  # noqa: F401
+
     config = load_config(config_path)
     train_dataset = prepare_train_dataset(config)
     model, tokenizer, bf16_supported, model_already_has_peft = load_policy_model(config)
@@ -101,6 +106,8 @@ def train(config_path: str) -> None:
     trainer_kwargs = {}
     if not model_already_has_peft:
         trainer_kwargs["peft_config"] = build_lora_config(config)
+    from trl import GRPOTrainer
+
     trainer = GRPOTrainer(
         model=model,
         args=build_grpo_config(config),

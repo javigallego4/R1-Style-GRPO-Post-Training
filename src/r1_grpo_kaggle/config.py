@@ -50,6 +50,13 @@ def validate_config(config: dict[str, Any]) -> None:
     if config["training"]["num_generations"] < 2:
         raise ValueError("GRPO requires at least two generations per prompt.")
 
+    generation_batch_size = config["training"].get(
+        "generation_batch_size",
+        config["training"]["per_device_train_batch_size"],
+    )
+    if generation_batch_size % config["training"]["num_generations"] != 0:
+        raise ValueError("training.generation_batch_size must be divisible by num_generations.")
+
     if config["dataset"]["train_size"] <= 0:
         raise ValueError("dataset.train_size must be positive.")
 

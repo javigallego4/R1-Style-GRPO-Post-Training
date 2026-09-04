@@ -15,6 +15,7 @@ class ConfigTests(unittest.TestCase):
     def test_smoke_config_loads(self):
         config = load_config("/Users/javigallego/Desktop/r1-grpo-kaggle/configs/smoke.yaml")
         self.assertEqual(config["training"]["max_steps"], 10)
+        self.assertEqual(config["training"]["generation_batch_size"], 2)
         self.assertFalse(config["tracking"]["enabled"])
         self.assertFalse(config["export"]["publish_adapter"])
 
