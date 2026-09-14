@@ -82,8 +82,9 @@ python scripts/inspect_data.py --config configs/smoke.yaml
 python scripts/train_kaggle.py --config configs/smoke.yaml
 ```
 
-The Kaggle entrypoint defaults to `configs/kaggle_smoke.yaml`, which keeps the run short but enables online W&B tracking through Kaggle Secrets.
+The Kaggle entrypoint defaults to `configs/kaggle_smoke.yaml`, which keeps the run short and runs `train_then_evaluate`: it trains a 10-step smoke adapter, then compares the base model and adapter on the configured held-out GSM8K subset.
 If a CLI-pushed version cannot see `WANDB_API_KEY`, open the Kaggle notebook UI, enable the secret again in Add-ons > Secrets, and rerun the same version from Kaggle.
+When the key is unavailable, the entrypoint falls back to disabled tracking and still writes local training and evaluation outputs.
 
 To test W&B without starting training, run this from the Kaggle notebook UI after enabling the `WANDB_API_KEY` secret:
 
@@ -92,6 +93,14 @@ WANDB_PROBE_ONLY=1 python kaggle_entry.py
 ```
 
 The expected successful log includes `Direct Kaggle secret bootstrap: WANDB_API_KEY loaded`, `api_key_available: True`, and a W&B probe result with `ok: True`.
+
+The Kaggle entrypoint can also be controlled with:
+
+```bash
+RUN_MODE=train python kaggle_entry.py
+RUN_MODE=evaluate ADAPTER_PATH=outputs/kaggle-smoke-adapter python kaggle_entry.py
+RUN_MODE=train_then_evaluate python kaggle_entry.py
+```
 
 Once the smoke run finishes, switch to the default configuration:
 

@@ -17,6 +17,7 @@ ROOT = entrypoint_root()
 REPO_URL = "https://github.com/javigallego4/R1-Style-GRPO-Post-Training.git"
 KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
 RUNTIME_CONFIG_PATH = Path("/kaggle/working/runtime_no_wandb.yaml")
+DEFAULT_ADAPTER_PATH = "outputs/kaggle-smoke-adapter"
 
 
 def configure_runtime_environment() -> None:
@@ -129,11 +130,21 @@ def main() -> None:
         wandb_status,
     )
     from r1_grpo_kaggle.train_grpo import train
+    from r1_grpo_kaggle.evaluate import evaluate_comparison
 
     config_path = os.environ.get("CONFIG_PATH", "configs/kaggle_smoke.yaml")
+    final_eval = os.environ.get("FINAL_EVAL", "0") == "1"
     print(f"Project directory: {project_dir}")
     print(f"Config path: {config_path}")
     config = load_config(config_path)
+    run_mode = os.environ.get(
+        "RUN_MODE",
+        config.get("runtime", {}).get("mode", "train"),
+    ).strip().lower()
+    adapter_path = os.environ.get(
+        "ADAPTER_PATH",
+        config.get("export", {}).get("adapter_dir", DEFAULT_ADAPTER_PATH),
+    )
     configure_wandb(config)
     print(f"Kaggle secret preflight: {kaggle_secret_diagnostics(configured_secret_names(config))}")
     status = wandb_status(config)
@@ -154,7 +165,34 @@ def main() -> None:
             f"Runtime config: {runtime_config_path}"
         )
         config_path = str(runtime_config_path)
-    train(config_path)
+        config = load_config(config_path)
+
+    if run_mode not in {"train", "evaluate", "train_then_evaluate"}:
+        raise ValueError("RUN_MODE must be one of: train, evaluate, train_then_evaluate.")
+
+    if run_mode in {"train", "train_then_evaluate"}:
+        train(config_path)
+
+    if run_mode in {"evaluate", "train_then_evaluate"}:
+        adapter_dir = Path(adapter_path)
+        if not adapter_dir.exists():
+            raise FileNotFoundError(
+                f"Adapter path does not exist: {adapter_dir}. "
+                "Run with RUN_MODE=train_then_evaluate or provide ADAPTER_PATH."
+            )
+        print(
+            "Running base-vs-adapter evaluation "
+            f"(adapter_path={adapter_dir}, final={final_eval})."
+        )
+        result = evaluate_comparison(
+            config_path,
+            adapter_path=str(adapter_dir),
+            final=final_eval,
+            log_to_wandb=bool(config.get("tracking", {}).get("enabled", False)),
+        )
+        print("Evaluation comparison outputs:")
+        for key, value in result["paths"].items():
+            print(f"- {key}: {value}")
 
 
 if __name__ == "__main__":

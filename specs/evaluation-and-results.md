@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for v1 base-vs-adapter comparison and W&B evaluation logging; first real Kaggle evaluation run remains pending.
+Implemented for v1 base-vs-adapter comparison, W&B evaluation logging, and Kaggle `train_then_evaluate` execution; first real Kaggle comparison output is running/next to verify.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the project evaluates the base model and trained adapter, saves resul
 
 ## Current Behavior
 
-The repository contains evaluation scripts that load the configured model, optionally apply a LoRA adapter, evaluate a reserved GSM8K split, compute exact numeric correctness, summarize reward components, write JSON/CSV/Markdown outputs, compare base-vs-adapter metrics, and log evaluation summaries plus examples to W&B when tracking is enabled.
+The repository contains evaluation scripts that load the configured model, optionally apply a LoRA adapter, evaluate a reserved GSM8K split, compute exact numeric correctness, summarize reward components, write JSON/CSV/Markdown outputs, compare base-vs-adapter metrics, and log evaluation summaries plus examples to W&B when tracking is enabled. The Kaggle entrypoint supports `train`, `evaluate`, and `train_then_evaluate` modes; the Kaggle smoke config runs training and evaluation in the same session so the adapter does not need to be published or committed.
 
 ## Desired Behavior
 
@@ -56,6 +56,7 @@ The project should run the same evaluation protocol on the base model and on the
 - Run evaluation on a small fixed subset.
 - Compare base model and adapter outputs in the same result schema.
 - Log evaluation metrics and selected examples to W&B when tracking is enabled.
+- Run Kaggle smoke in `train_then_evaluate` mode and download the generated comparison outputs.
 
 ## Confirmed Decisions
 
@@ -80,3 +81,4 @@ The project should run the same evaluation protocol on the base model and on the
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked basic JSON evaluation as partially implemented and identified base-vs-adapter/W&B reporting gaps.
 - 2026-09-14: Added base-vs-adapter comparison outputs, parse-failure metrics, CSV/Markdown reports, and W&B evaluation logging.
+- 2026-09-14: Added Kaggle entrypoint support for `train_then_evaluate` smoke runs.

@@ -14,19 +14,25 @@ from .tracking import initialize_wandb, is_wandb_enabled
 
 def load_model_and_tokenizer(config: dict[str, Any], adapter_path: str | None = None):
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-    model_name = config["model"]["name"]
+    model_cfg = config["model"]
+    model_name = model_cfg["name"]
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        device_map="auto",
-        torch_dtype=torch.float16,
-    )
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    model_kwargs: dict[str, Any] = {
+        "device_map": "auto",
+        "torch_dtype": torch.float16,
+    }
+    if model_cfg.get("load_in_4bit", False):
+        model_kwargs["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True)
+    model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
     if adapter_path:
         from peft import PeftModel
 
         model = PeftModel.from_pretrained(model, adapter_path)
+    model.eval()
     return model, tokenizer
 
 
@@ -34,7 +40,8 @@ def generate_completion(model, tokenizer, prompt: str, config: dict[str, Any]) -
     import torch
 
     eval_cfg = config["evaluation"]
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    device = next(model.parameters()).device
+    inputs = tokenizer(prompt, return_tensors="pt").to(device)
     with torch.no_grad():
         output_ids = model.generate(
             **inputs,
