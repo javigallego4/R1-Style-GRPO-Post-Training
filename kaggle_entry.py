@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import os
 import subprocess
 import sys
@@ -15,6 +16,7 @@ def entrypoint_root() -> Path:
 ROOT = entrypoint_root()
 REPO_URL = "https://github.com/javigallego4/R1-Style-GRPO-Post-Training.git"
 KAGGLE_REPO_DIR = Path("/kaggle/working/r1-grpo-kaggle")
+RUNTIME_CONFIG_PATH = Path("/kaggle/working/runtime_no_wandb.yaml")
 
 
 def configure_runtime_environment() -> None:
@@ -97,6 +99,18 @@ def install_dependencies(project_dir: Path) -> None:
     run([sys.executable, "-m", "pip", "install", "-q", "-r", str(project_dir / "requirements.txt")])
 
 
+def write_no_wandb_runtime_config(config: dict, path: Path = RUNTIME_CONFIG_PATH) -> Path:
+    import yaml
+
+    runtime_config = deepcopy(config)
+    runtime_config["tracking"]["enabled"] = False
+    runtime_config["tracking"]["mode"] = "disabled"
+    runtime_config["tracking"]["notes"] = "Runtime fallback: W&B disabled because no API key was available."
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.safe_dump(runtime_config, sort_keys=False), encoding="utf-8")
+    return path
+
+
 def main() -> None:
     configure_runtime_environment()
     bootstrap_wandb_from_kaggle_secret()
@@ -122,11 +136,24 @@ def main() -> None:
     config = load_config(config_path)
     configure_wandb(config)
     print(f"Kaggle secret preflight: {kaggle_secret_diagnostics(configured_secret_names(config))}")
-    print(f"W&B preflight: {wandb_status(config)}")
+    status = wandb_status(config)
+    print(f"W&B preflight: {status}")
     if os.environ.get("WANDB_PROBE_ONLY", "0") == "1":
         print("Running W&B probe only because WANDB_PROBE_ONLY=1.")
         print(f"W&B probe result: {run_wandb_probe(config)}")
         return
+    if (
+        config.get("tracking", {}).get("enabled")
+        and config.get("tracking", {}).get("mode") == "online"
+        and not status["api_key_available"]
+        and os.environ.get("ALLOW_WANDB_FALLBACK", "1") == "1"
+    ):
+        runtime_config_path = write_no_wandb_runtime_config(config)
+        print(
+            "W&B API key is unavailable; continuing with tracking disabled. "
+            f"Runtime config: {runtime_config_path}"
+        )
+        config_path = str(runtime_config_path)
     train(config_path)
 
 
