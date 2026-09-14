@@ -86,7 +86,7 @@ tracking:
   enabled: true
   project_name: r1-grpo-kaggle
   entity: null
-  run_name: kaggle-pilot-100-step
+  run_name: kaggle-pilot-50-step
   group: pilot
   job_type: pilot-train-eval
   tags:

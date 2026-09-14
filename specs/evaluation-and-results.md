@@ -74,6 +74,22 @@ The project should run the same evaluation protocol on the base model and on the
 
 Interpretation: the pipeline is now validated end to end, but the smoke run is too small to demonstrate learning. The result should be treated as infrastructure validation, not as model-quality evidence.
 
+## Latest Pilot Result
+
+- Kaggle version: 19
+- Run mode: `train_then_evaluate`
+- Training: 50 GRPO steps on 128 GSM8K training examples
+- Evaluation: 8 held-out GSM8K examples, base vs saved adapter
+- Base accuracy: 0.125
+- Adapter accuracy: 0.125
+- Accuracy delta: +0.00
+- Base parse failure rate: 0.00
+- Adapter parse failure rate: 0.00
+- Strict/soft XML format rates: 0.00 for both base and adapter
+- W&B: disabled by runtime fallback because CLI-launched Kaggle could not access the configured secret
+
+Interpretation: the first stable pilot run validates a longer train/evaluate loop and adapter export, but it still does not show held-out quality improvement. Training metrics show intermittent reward variation and occasional soft-format reward, but held-out outputs remain format-poor. The next iteration should focus on stronger format induction and/or a slightly longer run from Kaggle UI with W&B enabled.
+
 ## Confirmed Decisions
 
 - Evaluation must compare pre-training and post-training behavior.
@@ -99,3 +115,4 @@ Interpretation: the pipeline is now validated end to end, but the smoke run is t
 - 2026-09-14: Added base-vs-adapter comparison outputs, parse-failure metrics, CSV/Markdown reports, and W&B evaluation logging.
 - 2026-09-14: Added Kaggle entrypoint support for `train_then_evaluate` smoke runs.
 - 2026-09-14: Validated Kaggle version 16 end to end with train, adapter export, base-vs-adapter evaluation, and downloaded comparison outputs.
+- 2026-09-14: Validated Kaggle version 19 pilot end to end with 50 GRPO steps, adapter export, checkpoints, and base-vs-adapter evaluation.

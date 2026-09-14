@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for smoke training and pilot-run configuration; full default-run calibration remains pending.
+Implemented for smoke training and stable pilot-run validation; full default-run calibration remains pending.
 
 ## Objective
 
@@ -84,3 +84,4 @@ The project should expose a reproducible training script that loads the default 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked script-first GRPO smoke training, LoRA adapter export, and W&B training integration as implemented.
 - 2026-09-14: Added Kaggle pilot configuration for a conservative 50-step train-then-evaluate run.
+- 2026-09-14: Validated the conservative 50-step Kaggle pilot on version 19.
