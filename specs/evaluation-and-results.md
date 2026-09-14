@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for v1 base-vs-adapter comparison, W&B evaluation logging, and Kaggle `train_then_evaluate` execution; first real Kaggle comparison output is running/next to verify.
+Implemented for v1 base-vs-adapter comparison, W&B evaluation logging, and Kaggle `train_then_evaluate` execution. Kaggle smoke comparison has been validated on version 16.
 
 ## Objective
 
@@ -58,6 +58,22 @@ The project should run the same evaluation protocol on the base model and on the
 - Log evaluation metrics and selected examples to W&B when tracking is enabled.
 - Run Kaggle smoke in `train_then_evaluate` mode and download the generated comparison outputs.
 
+## Latest Smoke Result
+
+- Kaggle version: 16
+- Run mode: `train_then_evaluate`
+- Training: 10 GRPO steps on 32 GSM8K training examples
+- Evaluation: 4 held-out GSM8K examples, base vs saved adapter
+- Base accuracy: 0.25
+- Adapter accuracy: 0.25
+- Accuracy delta: +0.00
+- Base parse failure rate: 0.00
+- Adapter parse failure rate: 0.00
+- Strict/soft XML format rates: 0.00 for both base and adapter
+- W&B: disabled by runtime fallback because CLI-launched Kaggle could not access the configured secret
+
+Interpretation: the pipeline is now validated end to end, but the smoke run is too small to demonstrate learning. The result should be treated as infrastructure validation, not as model-quality evidence.
+
 ## Confirmed Decisions
 
 - Evaluation must compare pre-training and post-training behavior.
@@ -82,3 +98,4 @@ The project should run the same evaluation protocol on the base model and on the
 - 2026-09-05: Marked basic JSON evaluation as partially implemented and identified base-vs-adapter/W&B reporting gaps.
 - 2026-09-14: Added base-vs-adapter comparison outputs, parse-failure metrics, CSV/Markdown reports, and W&B evaluation logging.
 - 2026-09-14: Added Kaggle entrypoint support for `train_then_evaluate` smoke runs.
+- 2026-09-14: Validated Kaggle version 16 end to end with train, adapter export, base-vs-adapter evaluation, and downloaded comparison outputs.
