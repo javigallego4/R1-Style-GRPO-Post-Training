@@ -130,7 +130,6 @@ def main() -> None:
         wandb_status,
     )
     from r1_grpo_kaggle.train_grpo import train
-    from r1_grpo_kaggle.evaluate import evaluate_comparison
 
     config_path = os.environ.get("CONFIG_PATH", "configs/kaggle_smoke.yaml")
     final_eval = os.environ.get("FINAL_EVAL", "0") == "1"
@@ -184,15 +183,19 @@ def main() -> None:
             "Running base-vs-adapter evaluation "
             f"(adapter_path={adapter_dir}, final={final_eval})."
         )
-        result = evaluate_comparison(
+        command = [
+            sys.executable,
+            "scripts/evaluate_comparison.py",
+            "--config",
             config_path,
-            adapter_path=str(adapter_dir),
-            final=final_eval,
-            log_to_wandb=bool(config.get("tracking", {}).get("enabled", False)),
-        )
-        print("Evaluation comparison outputs:")
-        for key, value in result["paths"].items():
-            print(f"- {key}: {value}")
+            "--adapter-path",
+            str(adapter_dir),
+        ]
+        if final_eval:
+            command.append("--final")
+        if not config.get("tracking", {}).get("enabled", False):
+            command.append("--no-wandb")
+        run(command, cwd=project_dir)
 
 
 if __name__ == "__main__":

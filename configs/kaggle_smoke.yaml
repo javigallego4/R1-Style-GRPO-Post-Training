@@ -19,8 +19,8 @@ dataset:
   train_split: train
   eval_split: test
   train_size: 32
-  quick_eval_size: 16
-  final_eval_size: 32
+  quick_eval_size: 4
+  final_eval_size: 16
 
 prompt:
   system: "You are a careful mathematical reasoning assistant. Solve the problem step by step and provide the final integer answer in the required XML format."
