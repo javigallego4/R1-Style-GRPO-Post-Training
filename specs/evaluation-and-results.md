@@ -6,7 +6,7 @@
 
 ## Status
 
-Partially implemented; base-vs-adapter comparison, W&B evaluation logging, and final reporting remain pending.
+Implemented for v1 base-vs-adapter comparison and W&B evaluation logging; first real Kaggle evaluation run remains pending.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the project evaluates the base model and trained adapter, saves resul
 
 ## Current Behavior
 
-The repository contains a basic evaluation script that loads the configured model, optionally applies a LoRA adapter, evaluates a reserved GSM8K split, computes exact numeric correctness, summarizes reward components, and writes JSON results.
+The repository contains evaluation scripts that load the configured model, optionally apply a LoRA adapter, evaluate a reserved GSM8K split, compute exact numeric correctness, summarize reward components, write JSON/CSV/Markdown outputs, compare base-vs-adapter metrics, and log evaluation summaries plus examples to W&B when tracking is enabled.
 
 ## Desired Behavior
 
@@ -25,13 +25,13 @@ The project should run the same evaluation protocol on the base model and on the
 - [x] Evaluation can run on a reserved GSM8K split.
 - [x] Base model and adapter evaluation use the same prompts and parsing rules.
 - [x] Accuracy or exact-match correctness is reported.
-- [ ] Evaluation records parse failure rate.
+- [x] Evaluation records parse failure rate.
 - [x] Evaluation records format compliance where relevant.
 - [x] Representative examples are saved for human inspection.
 - [x] Metrics are saved in a machine-readable file.
-- [ ] Evaluation results are logged to W&B when enabled.
-- [ ] Quick evaluation supports 100-200 held-out examples.
-- [ ] Final evaluation supports 500+ held-out examples when runtime allows.
+- [x] Evaluation results are logged to W&B when enabled.
+- [x] Quick evaluation supports 100-200 held-out examples.
+- [x] Final evaluation supports 500+ held-out examples when runtime allows.
 
 ## Technical Notes
 
@@ -79,3 +79,4 @@ The project should run the same evaluation protocol on the base model and on the
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked basic JSON evaluation as partially implemented and identified base-vs-adapter/W&B reporting gaps.
+- 2026-09-14: Added base-vs-adapter comparison outputs, parse-failure metrics, CSV/Markdown reports, and W&B evaluation logging.

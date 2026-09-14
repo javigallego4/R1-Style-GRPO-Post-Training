@@ -106,6 +106,16 @@ python scripts/evaluate.py --config configs/default.yaml
 python scripts/evaluate.py --config configs/default.yaml --adapter-path outputs/adapter
 ```
 
+To compare the base model and a trained adapter with the same held-out examples:
+
+```bash
+python scripts/evaluate_comparison.py \
+  --config configs/kaggle_smoke.yaml \
+  --adapter-path outputs/kaggle-smoke-adapter
+```
+
+This writes JSON, CSV, and Markdown outputs under the configured `evaluation.output_dir`, including base metrics, adapter metrics, metric deltas, reward-component deltas, and qualitative examples. Add `--final` to use the final evaluation size, or `--no-wandb` to skip W&B evaluation logging.
+
 ## Configuration
 
 All important choices live in `configs/default.yaml`, including model, dataset size, GRPO settings, reward weights, W&B settings, and adapter export behavior.
