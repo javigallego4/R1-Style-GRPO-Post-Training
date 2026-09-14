@@ -100,7 +100,10 @@ The Kaggle entrypoint can also be controlled with:
 RUN_MODE=train python kaggle_entry.py
 RUN_MODE=evaluate ADAPTER_PATH=outputs/kaggle-smoke-adapter python kaggle_entry.py
 RUN_MODE=train_then_evaluate python kaggle_entry.py
+CONFIG_PATH=configs/kaggle_pilot.yaml python kaggle_entry.py
 ```
+
+For a first non-smoke pilot run from Kaggle CLI, set the kernel metadata `code_file` to `kaggle_pilot_entry.py` before pushing. This runs `configs/kaggle_pilot.yaml`: 100 GRPO steps on 256 GSM8K training examples, adapter export, and a 16-example base-vs-adapter evaluation.
 
 Once the smoke run finishes, switch to the default configuration:
 

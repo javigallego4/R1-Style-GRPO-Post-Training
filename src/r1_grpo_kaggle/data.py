@@ -30,6 +30,7 @@ def prepare_split(config: dict[str, Any], split_name: str, sample_size: int | No
 
     def convert(example: dict[str, str]) -> dict[str, str]:
         final_answer = extract_gsm8k_answer(example["answer"])
+        answer_parse_failed = final_answer is None
         if final_answer is None:
             final_answer = ""
         return {
@@ -37,9 +38,21 @@ def prepare_split(config: dict[str, Any], split_name: str, sample_size: int | No
             "question": example["question"],
             "reference_solution": example["answer"],
             "answer": final_answer,
+            "answer_parse_failed": answer_parse_failed,
         }
 
     return dataset.map(convert, remove_columns=dataset.column_names)
+
+
+def summarize_prepared_dataset(dataset) -> dict[str, int | float]:
+    sample_count = len(dataset)
+    malformed_count = sum(1 for sample in dataset if sample.get("answer_parse_failed"))
+    malformed_rate = malformed_count / sample_count if sample_count else 0.0
+    return {
+        "sample_count": sample_count,
+        "malformed_answer_count": malformed_count,
+        "malformed_answer_rate": malformed_rate,
+    }
 
 
 def prepare_train_dataset(config: dict[str, Any]):

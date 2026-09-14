@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for GSM8K train/eval preparation; malformed sample reporting remains pending.
+Implemented for GSM8K train/eval preparation and malformed answer reporting.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the project loads, normalizes, splits, and exposes the reasoning task
 
 ## Current Behavior
 
-The repository loads `openai/gsm8k` from configuration, builds training and evaluation splits, constructs prompts centrally, extracts numeric reference answers, and supports deterministic subset selection for smoke and evaluation modes.
+The repository loads `openai/gsm8k` from configuration, builds training and evaluation splits, constructs prompts centrally, extracts numeric reference answers, flags samples whose final answer cannot be parsed, and supports deterministic subset selection for smoke and evaluation modes.
 
 ## Desired Behavior
 
@@ -28,7 +28,7 @@ The project should load `openai/gsm8k`, use the training split for GRPO post-tra
 - [x] Each sample exposes the original question, reference answer, and parsed final numeric answer.
 - [x] A small subset mode exists for smoke tests.
 - [x] Dataset preparation is deterministic when a seed is provided.
-- [ ] Malformed or unparsable samples are counted and reported.
+- [x] Malformed or unparsable samples are counted and reported.
 - [x] Default configuration supports 1,000-2,000 training examples.
 - [x] Default configuration supports 100-200 quick evaluation examples.
 - [x] Final evaluation supports 500+ held-out examples when runtime allows.
@@ -71,9 +71,10 @@ The project should load `openai/gsm8k`, use the training split for GRPO post-tra
 
 ## Open Questions
 
-- Should malformed/unparsable sample counts be written into evaluation/training manifests?
+- Should malformed/unparsable sample counts be written into training manifests as well as inspection output?
 
 ## Change Log
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked GSM8K loading, split handling, deterministic subset selection, and prompt/answer preparation as implemented.
+- 2026-09-14: Added prepared-dataset malformed answer counts and inspection reporting.

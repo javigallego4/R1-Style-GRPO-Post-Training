@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for smoke training; full default-run calibration remains pending.
+Implemented for smoke training and pilot-run configuration; full default-run calibration remains pending.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define the script-first GRPO training pipeline for post-training a small instruc
 
 ## Current Behavior
 
-The repository contains script-first GRPO training code with configurable Unsloth model loading, LoRA adapter setup, TRL GRPO trainer construction, smoke configuration, W&B integration, and local adapter saving.
+The repository contains script-first GRPO training code with configurable Unsloth model loading, LoRA adapter setup, TRL GRPO trainer construction, smoke and pilot configurations, W&B integration, and local adapter saving.
 
 ## Desired Behavior
 
@@ -29,6 +29,7 @@ The project should expose a reproducible training script that loads the default 
 - [x] Fine-tuning updates adapter weights rather than full model weights.
 - [x] The training script supports a smoke-test mode.
 - [x] A smoke configuration runs a tiny GRPO job before the default run.
+- [x] A pilot configuration exists between smoke and full default scale.
 - [x] Adapter artifacts are saved to a predictable output directory.
 - [x] Training can resume or at least avoid losing final adapter artifacts when a run completes.
 - [x] Adapter publication is controlled by configuration and disabled by default.
@@ -82,3 +83,4 @@ The project should expose a reproducible training script that loads the default 
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked script-first GRPO smoke training, LoRA adapter export, and W&B training integration as implemented.
+- 2026-09-14: Added Kaggle pilot configuration for a 100-step train-then-evaluate run.
