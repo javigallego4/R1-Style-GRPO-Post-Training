@@ -6,7 +6,7 @@
 
 ## Status
 
-Implemented for Kaggle script execution, smoke validation, and pilot entrypoint execution; W&B online validation is supported through Kaggle UI secrets.
+Implemented for Kaggle script execution, smoke validation, and pilot configuration; W&B online validation is supported through Kaggle UI secrets.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Define how the repository should run on Kaggle's dual-T4 GPU environment from sc
 
 ## Current Behavior
 
-The repository contains a Kaggle script entrypoint, pilot entrypoint, kernel metadata generation, T4 accelerator metadata, runtime environment setup, smoke/pilot configurations, W&B Secret bootstrap, and documented CLI/UI execution notes.
+The repository contains a Kaggle script entrypoint, kernel metadata generation, T4 accelerator metadata, runtime environment setup, smoke/pilot configurations, W&B Secret bootstrap, and documented CLI/UI execution notes.
 
 ## Desired Behavior
 
@@ -32,7 +32,7 @@ The project should provide a clear script-based workflow that can be launched in
 - [x] The repository can generate Kaggle kernel metadata without hardcoding a user account.
 - [x] The Kaggle entrypoint is a Python script.
 - [x] A smoke configuration exists for low-cost Kaggle validation before a full run.
-- [x] A pilot entrypoint exists for the first non-smoke Kaggle run.
+- [x] A pilot configuration exists for the first non-smoke Kaggle run.
 
 ## Technical Notes
 
@@ -82,4 +82,4 @@ The project should provide a clear script-based workflow that can be launched in
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked Kaggle script runtime, T4 metadata, smoke config, and UI-based W&B validation as implemented.
-- 2026-09-14: Added Kaggle pilot entrypoint and configuration for a 100-step train-then-evaluate run.
+- 2026-09-14: Added Kaggle pilot configuration for a 100-step train-then-evaluate run.

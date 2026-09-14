@@ -103,7 +103,7 @@ RUN_MODE=train_then_evaluate python kaggle_entry.py
 CONFIG_PATH=configs/kaggle_pilot.yaml python kaggle_entry.py
 ```
 
-For a first non-smoke pilot run from Kaggle CLI, set the kernel metadata `code_file` to `kaggle_pilot_entry.py` before pushing. This runs `configs/kaggle_pilot.yaml`: 100 GRPO steps on 256 GSM8K training examples, adapter export, and a 16-example base-vs-adapter evaluation.
+For a first non-smoke pilot run, use `configs/kaggle_pilot.yaml`: 100 GRPO steps on 256 GSM8K training examples, adapter export, and a 16-example base-vs-adapter evaluation. From the Kaggle UI, set `CONFIG_PATH=configs/kaggle_pilot.yaml` before running `kaggle_entry.py`; for CLI-pushed kernels, use a one-off local default override before pushing.
 
 Once the smoke run finishes, switch to the default configuration:
 
