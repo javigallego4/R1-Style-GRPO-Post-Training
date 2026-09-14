@@ -82,4 +82,4 @@ The project should provide a clear script-based workflow that can be launched in
 
 - 2026-09-03: Initial draft.
 - 2026-09-05: Marked Kaggle script runtime, T4 metadata, smoke config, and UI-based W&B validation as implemented.
-- 2026-09-14: Added Kaggle pilot configuration for a 100-step train-then-evaluate run.
+- 2026-09-14: Added Kaggle pilot configuration for a conservative 50-step train-then-evaluate run.
