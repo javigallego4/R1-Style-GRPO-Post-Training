@@ -101,9 +101,12 @@ RUN_MODE=train python kaggle_entry.py
 RUN_MODE=evaluate ADAPTER_PATH=outputs/kaggle-smoke-adapter python kaggle_entry.py
 RUN_MODE=train_then_evaluate python kaggle_entry.py
 CONFIG_PATH=configs/kaggle_pilot.yaml python kaggle_entry.py
+CONFIG_PATH=configs/kaggle_pilot_large.yaml python kaggle_entry.py
 ```
 
 For a first non-smoke pilot run, use `configs/kaggle_pilot.yaml`: 50 GRPO steps on 128 GSM8K training examples, adapter export, and an 8-example base-vs-adapter evaluation. From the Kaggle UI, set `CONFIG_PATH=configs/kaggle_pilot.yaml` before running `kaggle_entry.py`; for CLI-pushed kernels, use a one-off local default override before pushing.
+
+For the first larger pilot, use `configs/kaggle_pilot_large.yaml`: 250 GRPO steps on 1,000 GSM8K training examples, adapter export, and a 64-example base-vs-adapter evaluation. It keeps the same conservative batch, generation, sequence, and LoRA settings that completed successfully on Kaggle T4x2.
 
 Once the smoke run finishes, switch to the default configuration:
 

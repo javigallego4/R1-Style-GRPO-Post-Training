@@ -90,6 +90,14 @@ Interpretation: the pipeline is now validated end to end, but the smoke run is t
 
 Interpretation: the first stable pilot run validates a longer train/evaluate loop and adapter export, but it still does not show held-out quality improvement. Training metrics show intermittent reward variation and occasional soft-format reward, but held-out outputs remain format-poor. The next iteration should focus on stronger format induction and/or a slightly longer run from Kaggle UI with W&B enabled.
 
+## Next Planned Large Pilot
+
+- Config: `configs/kaggle_pilot_large.yaml`
+- Training: 250 GRPO steps on 1,000 GSM8K training examples
+- Evaluation: 64 held-out GSM8K examples, base vs saved adapter
+- Stable settings retained from version 19: LoRA rank 8, 2 generations, batch size 2, 128-token completions, vLLM disabled
+- Purpose: test whether more data and more GRPO steps produce measurable format or correctness movement before attempting the full default run
+
 ## Confirmed Decisions
 
 - Evaluation must compare pre-training and post-training behavior.
@@ -116,3 +124,4 @@ Interpretation: the first stable pilot run validates a longer train/evaluate loo
 - 2026-09-14: Added Kaggle entrypoint support for `train_then_evaluate` smoke runs.
 - 2026-09-14: Validated Kaggle version 16 end to end with train, adapter export, base-vs-adapter evaluation, and downloaded comparison outputs.
 - 2026-09-14: Validated Kaggle version 19 pilot end to end with 50 GRPO steps, adapter export, checkpoints, and base-vs-adapter evaluation.
+- 2026-09-14: Added planned large-pilot evaluation target for 250 GRPO steps and 64 held-out examples.
